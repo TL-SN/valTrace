@@ -1,5 +1,5 @@
 import subprocess,shutil,os
-from .funstat import get_func_trace, ptfunlist
+from ..tools.funstat import get_func_trace, ptfunlist
 
 def check_program_installed():
     """
@@ -64,6 +64,8 @@ def run_valstat(binary_path, temp_dir="./tmp"):
     Orchestrates the entire process: checking programs, creating directories,
     running valgrind, annotating, and running funstat.
     """
+
+    print("Running valstat...")
     # Check if necessary programs are installed
     check_program_installed()
 
