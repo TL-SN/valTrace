@@ -1,6 +1,8 @@
 # valTrace
 Valgrind extension tool.
 
+
+pip install -r requirements.txt
 ## valstat
 Execution of statistical functions
 使用方式:
