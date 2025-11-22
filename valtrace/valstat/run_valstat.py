@@ -58,6 +58,7 @@ def run_funstat(binary_path, temp_dir):
     """
     func_list = get_func_trace(binary_path, os.path.join(temp_dir, 'callannote.log'))
     ptfunlist(func_list)
+    return func_list
 
 def run_valstat(binary_path, temp_dir="./tmp"):
     """
@@ -80,7 +81,7 @@ def run_valstat(binary_path, temp_dir="./tmp"):
     run_callgrind_annotate(temp_dir)
 
     # Run the funstat.py script with the appropriate parameters
-    run_funstat(binary_path, temp_dir)
+    return run_funstat(binary_path, temp_dir)
 
 if __name__ == "__main__":
     BINARYPATH = '/mnt/d/MYTOOLS/ValTrace/valtrace/valstat/testcase/statistics_func_test'
