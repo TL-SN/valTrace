@@ -84,6 +84,8 @@ if __name__ == "__main__":
     binary_path = args.binarypath
     call_annotate_path = args.callgrindlogpath
 
+    # binary_path="/root/build/sbin/minidlnad"
+    # call_annotate_path="/mnt/d/MYTOOLS/ValTrace/tmp/callannote.log"
     execfunlist=get_func_trace(binary_path,call_annotate_path)
 
     ptfunlist(execfunlist)

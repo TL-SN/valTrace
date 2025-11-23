@@ -42,16 +42,36 @@ def run_valgrind_with_noinstr(binary_path:str, run_params:str,temp_dir:str):
         '--instr-atstart=no',
         binary_path, run_params
     ]
-    # Run the command and suppress stderr output
-    with open(os.devnull, 'w') as devnull:
-        subprocess.run(valgrind_command, stderr=devnull)
+    # Run 
+    # subprocess.run(valgrind_command)
+    
+    subprocess.Popen(valgrind_command)
+    
 
-# callgrind_control --instr=on
+def set_callgrind_instr_off():
+    while True:
+        callgrind_control_command = [
+            'callgrind_control', '--instr=off'
+        ]
+        result = subprocess.run(callgrind_control_command, capture_output=True, text=True)
+        if "No active callgrind runs detected." in result.stdout or "No active callgrind runs detected." in result.stderr:
+            time.sleep(0.5)
+        else:
+            print("valgrind instrumentation turned on. wait 1s...")
+            time.sleep(1)
+            return 
+
+
+def prompt_set_instr(turnon_event):
+    while not turnon_event.is_set():
+        time.sleep(3)
+        print("[+]Whether set Valgrind's instr=on? (yes or no)",flush=True)
+
+
 def set_callgrind_instr_on():
     """
     Set callgrind to start instrumentation.
     """
-
     while True:
         callgrind_control_command = [
             'callgrind_control', '--instr=on'
@@ -60,7 +80,7 @@ def set_callgrind_instr_on():
         if "No active callgrind runs detected." in result.stdout or "No active callgrind runs detected." in result.stderr:
             time.sleep(0.5)
         else:
-            print("valgrind instrumentation turned on. wait 1s...")
+            print("Valgrind instrumentation turned on. plz wait 1s...")
             time.sleep(1)
             return 
 
@@ -84,6 +104,10 @@ def run_funstat(binary_path, temp_dir):
     return func_list
 
 
+def prompt_user(stop_event):
+    while not stop_event.is_set():  # 直到接收到停止信号
+        time.sleep(3)  # 每5秒输出一次提示
+        print("[-]Confirm whether valgrind is tracking the end... (yes or no): ", flush=True)
 
 
 def run_valIntervalStat(binary_path:str,run_params:str,  temp_dir="./tmp"):
@@ -102,17 +126,47 @@ def run_valIntervalStat(binary_path:str,run_params:str,  temp_dir="./tmp"):
 
 
 
-
-
-    turnon_thread = threading.Thread(target=set_callgrind_instr_on)
-    turnon_thread.start()
-
-
-    # Run valgrind with --instr-atstart=no to generate callgrind.log
+    # async Run valgrind with --instr-atstart=no to generate callgrind.log
     run_valgrind_with_noinstr(binary_path,run_params, temp_dir)
 
+    turnon_event = threading.Event()
+    turnon_thread = threading.Thread(target=prompt_set_instr,args=(turnon_event,),daemon=True)
+    turnon_thread.start()
+    
+    while True:
+        isturnon = input("[+]Whether set Valgrind's instr=on? (yes or no)\n").strip().lower()
+        if isturnon == "" or nextstep == "yes":
+            turnon_event.set()
+            set_callgrind_instr_on()
+            print("now Valgrind will collect run messages...")
+            
+            break
+
+    
     turnon_thread.join()
 
+
+
+
+
+
+    stop_event = threading.Event()  # 创建一个停止事件对象
+    thread = threading.Thread(target=prompt_user, args=(stop_event,), daemon=True)
+    thread.start()
+    while True:
+        nextstep = input("[-]Confirm whether valgrind is tracking the end... (yes or no): \n").strip().lower()
+        if nextstep == "" or nextstep == "yes":
+            print("now start callgrind_annotate...")
+            stop_event.set()
+            time.sleep(1)
+            break
+
+
+
+
+
+
+    thread.join()
     run_callgrind_annotate(temp_dir)
     # Run the funstat.py script with the appropriate parameters
     return run_funstat(binary_path, temp_dir)

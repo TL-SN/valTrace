@@ -1,6 +1,6 @@
 import subprocess,shutil,os
 from ..tools.funstat import get_func_trace, ptfunlist
-
+import time
 def check_program_installed():
     """
     Check if the necessary programs are installed.
@@ -37,21 +37,12 @@ def run_valgrind(binary_path:str,run_params:str, temp_dir:str):
         '--callgrind-out-file=' + os.path.join(temp_dir, 'callgrind.log'),
         binary_path,run_params
     ]
-    # Run the command
-    # result = subprocess.run(
-    #     valgrind_command, 
-    #     capture_output=True,  # Capture stdout and stderr
-    #     text=True,           # Decode output as text (string)
-    #     check=True          # Raise an error for non-zero exit codes
-    # )
-    # print("Standard Output:")
-    # print(result.stdout)
-        
-    # print("Standard Error:")
-    # print(result.stderr)
-    with open(os.devnull, 'w') as devnull: 
-        subprocess.run(valgrind_command, stderr=devnull)
 
+    # with open(os.devnull, 'w') as devnull: 
+    subprocess.run(valgrind_command)
+    print("wait for finish exec ...")
+    time.sleep(2)
+    print("continue...")
 def run_callgrind_annotate(temp_dir):
     """
     Run the callgrind_annotate tool to generate callannote.log.
@@ -87,6 +78,7 @@ def run_valstat(binary_path:str,run_params:str ,temp_dir="./tmp"):
 
     # Run valgrind to generate callgrind.log
     run_valgrind(binary_path, run_params, temp_dir)
+    
 
     # Run callgrind_annotate to generate callannote.log
     run_callgrind_annotate(temp_dir)
