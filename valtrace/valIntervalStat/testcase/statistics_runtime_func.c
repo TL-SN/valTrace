@@ -77,7 +77,7 @@ double calculate_power(double base, int exponent) {
 
 void process_data(int input) {
     printf("\n=== 处理数据 ===\n");
-    
+    getchar(); // 用于调试时暂停输出，方便观察
     // 嵌套调用多个第二层函数
     int fact_result = calculate_factorial(input);
     double power_result = calculate_power(2.5, input);
