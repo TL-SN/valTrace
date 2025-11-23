@@ -28,17 +28,28 @@ def clean_log_files(temp_dir):
         if os.path.exists(log_file_path):
             os.remove(log_file_path)
 
-def run_valgrind(binary_path, temp_dir):
+def run_valgrind(binary_path:str,run_params:str, temp_dir:str):
     """
     Run the valgrind tool to generate callgrind.log.
     """
     valgrind_command = [
         'valgrind', '--tool=callgrind', '--trace-children=yes',
         '--callgrind-out-file=' + os.path.join(temp_dir, 'callgrind.log'),
-        binary_path
+        binary_path,run_params
     ]
-    # Run the command and suppress stderr output
-    with open(os.devnull, 'w') as devnull:
+    # Run the command
+    # result = subprocess.run(
+    #     valgrind_command, 
+    #     capture_output=True,  # Capture stdout and stderr
+    #     text=True,           # Decode output as text (string)
+    #     check=True          # Raise an error for non-zero exit codes
+    # )
+    # print("Standard Output:")
+    # print(result.stdout)
+        
+    # print("Standard Error:")
+    # print(result.stderr)
+    with open(os.devnull, 'w') as devnull: 
         subprocess.run(valgrind_command, stderr=devnull)
 
 def run_callgrind_annotate(temp_dir):
@@ -60,7 +71,7 @@ def run_funstat(binary_path, temp_dir):
     ptfunlist(func_list)
     return func_list
 
-def run_valstat(binary_path, temp_dir="./tmp"):
+def run_valstat(binary_path:str,run_params:str ,temp_dir="./tmp"):
     """
     Orchestrates the entire process: checking programs, creating directories,
     running valgrind, annotating, and running funstat.
@@ -75,7 +86,7 @@ def run_valstat(binary_path, temp_dir="./tmp"):
     clean_log_files(temp_dir)
 
     # Run valgrind to generate callgrind.log
-    run_valgrind(binary_path, temp_dir)
+    run_valgrind(binary_path, run_params, temp_dir)
 
     # Run callgrind_annotate to generate callannote.log
     run_callgrind_annotate(temp_dir)

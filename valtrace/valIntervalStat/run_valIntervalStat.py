@@ -32,7 +32,7 @@ def clean_log_files(temp_dir):
 
 
 # valgrind --tool=callgrind --trace-children=yes --callgrind-out-file=callgrind.log.log  --instr-atstart=no ./test_func 2> /dev/null
-def run_valgrind_with_noinstr(binary_path, temp_dir):
+def run_valgrind_with_noinstr(binary_path:str, run_params:str,temp_dir:str):
     """
     Run the valgrind tool to generate callgrind.log.
     """
@@ -40,7 +40,7 @@ def run_valgrind_with_noinstr(binary_path, temp_dir):
         'valgrind', '--tool=callgrind', '--trace-children=yes',
         '--callgrind-out-file=' + os.path.join(temp_dir, 'callgrind.log'),
         '--instr-atstart=no',
-        binary_path
+        binary_path, run_params
     ]
     # Run the command and suppress stderr output
     with open(os.devnull, 'w') as devnull:
@@ -60,7 +60,8 @@ def set_callgrind_instr_on():
         if "No active callgrind runs detected." in result.stdout or "No active callgrind runs detected." in result.stderr:
             time.sleep(0.5)
         else:
-            print("valgrind instrumentation turned on.")
+            print("valgrind instrumentation turned on. wait 1s...")
+            time.sleep(1)
             return 
 
 def run_callgrind_annotate(temp_dir):
@@ -85,7 +86,7 @@ def run_funstat(binary_path, temp_dir):
 
 
 
-def run_valIntervalStat(binary_path, temp_dir="./tmp"):
+def run_valIntervalStat(binary_path:str,run_params:str,  temp_dir="./tmp"):
     """
     Orchestrates the entire process: checking programs, creating directories,
     running valgrind, annotating, and running funstat.
@@ -108,7 +109,7 @@ def run_valIntervalStat(binary_path, temp_dir="./tmp"):
 
 
     # Run valgrind with --instr-atstart=no to generate callgrind.log
-    run_valgrind_with_noinstr(binary_path, temp_dir)
+    run_valgrind_with_noinstr(binary_path,run_params, temp_dir)
 
     turnon_thread.join()
 
