@@ -22,17 +22,7 @@ ValTrace consists of **two core modules**:
 - **callgrind_annotate**: Part of the Valgrind toolchain
 - **callgrind_control**: Part of the Valgrind toolchain
 
-### 📦 **Python Dependencies**
 
-Install Python dependencies using:
-
-```
-pip install -r requirements.txt
-```
-
-Current dependencies:
-
-- `pyelftools==0.32`: For ELF file parsing and symbol table handling.
 
 ------
 
@@ -174,6 +164,10 @@ The project includes two test cases to validate the functionality of the tools:
 
 - **`test_valstat.py`**: Tests for the `valstat` module.
 - **`test_valIntervalStat.py`**: Tests for the `valIntervalStat` module.
+
+
+
+<video src="show____List the functions executed during the CVE-2023-33476_minidlnad POC runtime..mp4"></video>
 
 ------
 
